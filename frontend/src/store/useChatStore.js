@@ -49,7 +49,7 @@ export const useChatStore = create((set, get) => ({
         const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
         set({ messages: [...messages, res.data] });
       } catch (error) {
-        toast.error(error?.response?.data?.message || error.message || "An error occurre");
+        toast.error(error?.response?.data?.message || error.message || "An error occurred");
       }
     },
 

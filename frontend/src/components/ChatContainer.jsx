@@ -12,7 +12,6 @@ import { formatMessageTime } from "../lib/utils";
 const ChatContainer = () => {
   const {
     messages,
-    setMessages,
     isMessagesLoading,
     selectedUser,
     getMessages,
