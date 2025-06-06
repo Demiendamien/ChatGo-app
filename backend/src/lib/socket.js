@@ -3,7 +3,7 @@ import http from "http";
 import express from "express";
 
 const app = express();
-const server = http.createServer(app);
+const server = http.createServer(ap);
 
 const io = new Server(server, {
   cors: {
