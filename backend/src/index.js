@@ -24,13 +24,14 @@ app.use(cookieParser());
 
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
+//   "http://localhost:5173",
+//   "http://localhost:5174",
   "https://chatgo-app-front.onrender.com"
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
+    console.log("Received request from origin:", origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -40,8 +41,23 @@ app.use(cors({
   credentials: true,
 }));
 
+app.options('*', cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+
+app.get("/ping", (req, res) => {
+  res.json({ message: "pong" });
+});
 
 app.get("/cors-test", (req, res) => {
   res.json({
