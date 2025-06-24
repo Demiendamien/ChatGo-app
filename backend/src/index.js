@@ -23,26 +23,15 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
 
-const allowedOrigins = [
-//   "http://localhost:5173",
-//   "http://localhost:5174",
-  "https://chatgo-app-front.onrender.com"
-];
-
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
+    const allowedOrigins = [
+      "https://chatgo-app-front.onrender.com",
+      // autres origines si besoin
+    ];
+
     console.log("Received request from origin:", origin);
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
 
-app.options('/*', cors({
-  origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -50,7 +39,13 @@ app.options('/*', cors({
     }
   },
   credentials: true
-}));
+};
+
+// Middleware CORS global
+app.use(cors(corsOptions));
+
+// Préflight OPTIONS
+app.options("*", cors(corsOptions));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
