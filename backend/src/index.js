@@ -43,6 +43,13 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+app.get("/cors-test", (req, res) => {
+  res.json({
+    message: "CORS test successful 🎉",
+    origin: req.headers.origin || "no origin header",
+  });
+});
+
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../frontend/dist")));
     app.get("*", (req, res) => {
