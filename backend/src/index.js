@@ -15,56 +15,38 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 
-// ✅ MISE À JOUR : nouvelle URL backend
-const allowedOrigins = [
-  "https://chatgo-app-front.onrender.com",  // Frontend
-  "https://chat-app-3.onrender.com",        // Backend (URL mise à jour !)
-  //"http://localhost:5173"                 // Dev local si besoin
-];
-
+// Configuration CORS simple et efficace
 const corsOptions = {
-  origin: function (origin, callback) {
-    console.log("CORS check - origin:", origin);
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log("CORS blocked for origin:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: [
+    "https://chatgo-app-front.onrender.com",
+    "https://chat-app-3.onrender.com"
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
-  optionsSuccessStatus: 200 // Pour les anciens navigateurs
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 };
 
-// ✅ CORS en premier - AVANT tout le reste
+// CORS middleware - simple et propre
 app.use(cors(corsOptions));
 
-// ✅ Gestion explicite des preflight OPTIONS pour toutes les routes
-app.options('*', cors(corsOptions));
-
-// ✅ Middleware de parsing
+// Middleware de parsing
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
-// ✅ Routes API
+// Routes API
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-// ✅ Route de test CORS
+// Route de test
 app.get("/cors-test", (req, res) => {
   res.json({
     message: "CORS test successful 🎉",
-    origin: req.headers.origin || "no origin header",
-    method: req.method,
-    headers: req.headers
+    origin: req.headers.origin || "no origin header"
   });
 });
 
 server.listen(PORT, () => {
   console.log('Server is running on port', PORT);
-  console.log('Allowed origins:', allowedOrigins);
   connectDB();
 });
