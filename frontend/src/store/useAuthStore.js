@@ -5,8 +5,20 @@ import { io } from "socket.io-client";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "/";
 
+useEffect(() => {
+  fetch("https://chat-app-3.onrender.com/cors-test", {
+    method: "GET",
+    credentials: "include"
+  })
+    .then(res => res.json())
+    .then(data => console.log("Réponse backend :", data))
+    .catch(err => console.error("Erreur de requête :", err));
+}, []);
+
+
 
 export const useAuthStore = create((set, get) => ({
+  
   authUser: null,
   isSignUp: false,
   isLoggingIn: false,
@@ -15,19 +27,18 @@ export const useAuthStore = create((set, get) => ({
   onlineUsers: [],
   socket: null,
 
-  // checkAuth: async () => {
-  //   try {
-  //     const res = await axiosInstance.get("/auth/check");
+  checkAuth: async () => {
+    try {
+      const res = await axiosInstance.get("/auth/check");
 
-  //     set({ authUser: res.data });
-  //     get().connectSocket();
-  //   } catch (error) {
-  //     set({ authUser: null });
-  //   } finally {
-  //     set({ isCheckingAuth: false });
-  //   }
-  // },
-
+      set({ authUser: res.data });
+      get().connectSocket();
+    } catch (error) {
+      set({ authUser: null });
+    } finally {
+      set({ isCheckingAuth: false });
+    }
+  },
   
 
   signup: async (data) => {
