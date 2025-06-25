@@ -15,17 +15,16 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 
-// Définir les origines autorisées (ajoute localhost pour dev si besoin)
+// ✅ MISE À JOUR : nouvelle URL backend
 const allowedOrigins = [
-  "https://chatgo-app-front.onrender.com",
-  "https://chatgo-app-3.onrender.com",
-  //"http://localhost:5173"
+  "https://chatgo-app-front.onrender.com",  // Frontend
+  "https://chat-app-3.onrender.com",        // Backend (URL mise à jour !)
+  //"http://localhost:5173"                 // Dev local si besoin
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
     console.log("CORS check - origin:", origin);
-    // Permet les requêtes sans origine (Postman, curl, etc.) ET les origines autorisées
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -35,28 +34,43 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
+  optionsSuccessStatus: 200 // Pour les anciens navigateurs
 };
 
-// Place CORS AVANT toutes les routes
+// ✅ CORS en premier - AVANT tout le reste
 app.use(cors(corsOptions));
-//app.options("*", cors(corsOptions));
 
+// ✅ Gestion explicite des preflight OPTIONS pour toutes les routes
+app.options('*', cors(corsOptions));
+
+// ✅ Middleware de parsing
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
+// ✅ Routes API
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+// ✅ Route de test CORS
 app.get("/cors-test", (req, res) => {
   res.json({
     message: "CORS test successful 🎉",
     origin: req.headers.origin || "no origin header",
+    method: req.method,
+    headers: req.headers
   });
 });
 
+// ✅ Route de test pour preflight
+app.options("/api/*", (req, res) => {
+  console.log("Preflight request received for:", req.originalUrl);
+  res.status(200).end();
+});
+
 server.listen(PORT, () => {
-  console.log('server is running on port', PORT);
+  console.log('Server is running on port', PORT);
+  console.log('Allowed origins:', allowedOrigins);
   connectDB();
 });
