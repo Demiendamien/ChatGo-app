@@ -23,19 +23,28 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
 
+// Définir les origines autorisées
 const allowedOrigins = [
-//   "http://localhost:5173",
-//   "http://localhost:5174",
   "https://chatgo-app-front.onrender.com"
 ];
 
-// Add CORS middleware
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://chatgo-app-front.onrender.com'); // Or '*' for any origin
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE'); // Allowed methods
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allowed headers
-  next();
-});
+const corsOptions = {
+  origin: function (origin, callback) {
+    console.log("CORS check - origin:", origin);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+};
+
+// Middleware global
+app.use(cors(corsOptions));
+
+// Préflight request sans "*"
+app.options("/*", cors(corsOptions)); // le slash résout ton problème
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
