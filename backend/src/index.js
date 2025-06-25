@@ -63,12 +63,6 @@ app.get("/cors-test", (req, res) => {
   });
 });
 
-// ✅ Route de test pour preflight
-app.options("/api/*", (req, res) => {
-  console.log("Preflight request received for:", req.originalUrl);
-  res.status(200).end();
-});
-
 server.listen(PORT, () => {
   console.log('Server is running on port', PORT);
   console.log('Allowed origins:', allowedOrigins);
