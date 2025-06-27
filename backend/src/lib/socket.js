@@ -8,16 +8,13 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      "https://chat-go-app-41li.vercel.app",
-      "https://ton-backend.onrender.com",
-      "https://chatgo-app-front.onrender.com",
-      "http://localhost:5173", // optionnel en dev
-      "http://localhost:5174"  // optionnel en dev
+      "http://localhost:5173", // Dev local
+      "https://chat-go-app-41li.vercel.app", // Frontend Vercel
+      "https://chatgo-app-3.onrender.com", // Backend public
     ],
     credentials: true,
   },
 });
-
 
 const userSocketMap = {};
 
@@ -26,7 +23,7 @@ export function getReceiverSocketId(userId) {
 }
 
 io.on("connection", (socket) => {
-  console.log("A user connected", socket.id);
+  console.log("🟢 Nouvelle connexion Socket.io:", socket.id);
 
   const userId = socket.handshake.query.userId;
   if (userId) {
@@ -35,7 +32,7 @@ io.on("connection", (socket) => {
   }
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected", socket.id);
+    console.log("🔴 Déconnexion Socket.io:", socket.id);
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
