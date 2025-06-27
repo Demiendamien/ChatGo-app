@@ -8,13 +8,16 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      // "https://chatgo-app-front.onrender.com"
+      "https://chat-go-app-41li.vercel.app",
+      "https://ton-backend.onrender.com",
+      "https://chatgo-app-front.onrender.com",
+      "http://localhost:5173", // optionnel en dev
+      "http://localhost:5174"  // optionnel en dev
     ],
     credentials: true,
   },
 });
+
 
 const userSocketMap = {};
 
