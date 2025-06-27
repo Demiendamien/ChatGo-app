@@ -162,6 +162,12 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
+// Debug middleware - pour voir toutes les requêtes
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+  next();
+});
+
 // Routes API
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
@@ -172,6 +178,20 @@ app.get("/cors-test", (req, res) => {
     message: "CORS test successful 🎉",
     origin: req.headers.origin || "no origin header"
   });
+});
+
+// Route de debug pour voir toutes les routes disponibles
+app.get("/debug-routes", (req, res) => {
+  const routes = [];
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      routes.push({
+        path: middleware.route.path,
+        methods: Object.keys(middleware.route.methods)
+      });
+    }
+  });
+  res.json({ routes });
 });
 
 server.listen(PORT, () => {
