@@ -2,24 +2,11 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
-import { useEffect } from "react";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "/";
-
-useEffect(() => {
-  fetch("https://chat-app-3.onrender.com/cors-test", {
-    method: "GET",
-    credentials: "include"
-  })
-    .then(res => res.json())
-    .then(data => console.log("Réponse backend :", data))
-    .catch(err => console.error("Erreur de requête :", err));
-}, []);
-
-
+const BASE_URL = import.meta.env.MODE === "development"
+  ? "http://localhost:5001" : "/";
 
 export const useAuthStore = create((set, get) => ({
-  
   authUser: null,
   isSignUp: false,
   isLoggingIn: false,
@@ -27,11 +14,11 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   onlineUsers: [],
   socket: null,
+  messages: [], // optionnel, si pas déjà géré dans useChatStore
 
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
@@ -40,7 +27,6 @@ export const useAuthStore = create((set, get) => ({
       set({ isCheckingAuth: false });
     }
   },
-  
 
   signup: async (data) => {
     set({ isSignUp: true });
@@ -48,12 +34,9 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
       toast.success("Account created successfully");
-
       get().connectSocket();
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message || error.message || "An error occurred"
-      );
+      toast.error(error?.response?.data?.message || error.message || "An error occurred");
     } finally {
       set({ isSignUp: false });
     }
@@ -65,12 +48,9 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
-
       get().connectSocket();
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message || error.message || "An error occurred"
-      );
+      toast.error(error?.response?.data?.message || error.message || "An error occurred");
     } finally {
       set({ isLoggingIn: false });
     }
@@ -78,14 +58,12 @@ export const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     try {
-      const res = await axiosInstance.post("/auth/logout");
+      await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message || error.message || "An error occurred"
-      );
+      toast.error(error?.response?.data?.message || error.message || "An error occurred");
     }
   },
 
@@ -96,9 +74,7 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message || error.message || "An error occurred"
-      );
+      toast.error(error?.response?.data?.message || error.message || "An error occurred");
     } finally {
       set({ isUpdatingProfile: false });
     }
@@ -128,23 +104,25 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  subscribeToMessages: () => {
-    const { selectedUser } = get();
-    if (!selectedUser) return;
+  // subscribeToMessages: () => {
+  //   const { selectedUser } = get();
+  //   if (!selectedUser) return;
 
-    const { socket } = useAuthStore.getState().socket;
+  //   const socket = useAuthStore.getState().socket;
+  //   if (!socket) return;
 
-    socket.on("newMessage", (newMessage) => {
-      set({
-        messages: [...get().messages, newMessage],
-      });
-    });
-  },
+  //   socket.on("newMessage", (newMessage) => {
+  //     const currentMessages = get().messages || [];
+  //     set({
+  //       messages: [...currentMessages, newMessage],
+  //     });
+  //   });
+  // },
 
-  unsubscribeFromMessages: () => {
-    const socket = useAuthStore.getState().socket;
-    if (socket && typeof socket.off === "function") {
-      socket.off("newMessage");
-    }
-  },
+  // unsubscribeFromMessages: () => {
+  //   const socket = useAuthStore.getState().socket;
+  //   if (socket && typeof socket.off === "function") {
+  //     socket.off("newMessage");
+  //   }
+  // },
 }));

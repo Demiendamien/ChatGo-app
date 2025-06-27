@@ -3,7 +3,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Loader2, EyeClosedIcon, EyeIcon, MessageSquare, Mail, Lock } from "lucide-react";
 import { toast } from "react-hot-toast";
 import AuthImagePattern from "../components/AuthImagePattern";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,10 +20,21 @@ const LoginPage = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = validateForm();
-    if (success === true) login(formData);
+    if (validateForm()) {
+      try {
+        await login(formData);
+        // Optionnel : toast.success("Logged in successfully");
+      } catch (error) {
+        toast.error(error.message || "Login failed");
+      }
+    }
   };
 
   return (
@@ -53,13 +64,12 @@ const LoginPage = () => {
                 <Mail className="size-6 text-base-content/40" />
               </div>
               <input
-                type="text"
-                className={`input input-bordered w-full pl-10`}
+                type="email"
+                name="email"
+                className="input input-bordered w-full pl-10"
                 placeholder="you@example.com"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -74,17 +84,18 @@ const LoginPage = () => {
               </div>
               <input
                 type={showPassword ? "text" : "password"}
-                className={`input input-bordered w-full pl-10`}
+                name="password"
+                className="input input-bordered w-full pl-10"
                 placeholder=".........."
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                onChange={handleChange}
               />
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center pr-3"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeIcon className="size-5 text-base-content/40" />

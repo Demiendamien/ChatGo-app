@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import {
   Loader2,
@@ -12,7 +12,6 @@ import {
 import { Link } from "react-router-dom";
 
 import AuthImagePattern from "../components/AuthImagePattern";
-import { useState } from "react";
 import { toast } from "react-hot-toast"; 
 
 const SignUpPage = () => {
@@ -32,16 +31,25 @@ const SignUpPage = () => {
     if (!formData.password.trim()) return toast.error("Password is required");
     if(formData.password.length < 6) return toast.error("Password must be at least 6 characters");
 
-
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const success = validateForm();
-    if (success===true) signup(formData);
-    
+    if (validateForm()) {
+      try {
+        await signup(formData);
+        // Optionnel : toast.success("Account created successfully");
+      } catch (error) {
+        toast.error(error.message || "Sign up failed");
+      }
+    }
   };
 
   return (
@@ -51,15 +59,16 @@ const SignUpPage = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-            <div 
-              className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <MessageSquare className="size-6 text-primary" />
+              <div 
+                className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors"
+              >
+                <MessageSquare className="size-6 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold mt-2">Create Account</h1>
+              <p className="text-base-content/60">
+                Get started with your free account
+              </p>
             </div>
-            <h1 className="text-2xl font-bold mt-2">Create Account</h1>
-            <p className="text-base-content/60">
-              Get started with your free account
-            </p>
-          </div>
           </div>    
         </div>
 
@@ -74,12 +83,11 @@ const SignUpPage = () => {
               </div>
               <input
                 type="text"
-                className={`input input-bordered w-full pl-10`}
+                name="fullName"
+                className="input input-bordered w-full pl-10"
                 placeholder="John Doe"
                 value={formData.fullName}
-                onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
-                }
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -93,13 +101,12 @@ const SignUpPage = () => {
                 <Mail className="size-6 text-base-content/40" />
               </div>
               <input
-                type="text"
-                className={`input input-bordered w-full pl-10`}
+                type="email"
+                name="email"
+                className="input input-bordered w-full pl-10"
                 placeholder="you@example.com"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -114,18 +121,19 @@ const SignUpPage = () => {
                 <Lock className="size-5 text-base-content/40" />
               </div>
               <input
-                type={showPassword? "text" : "password"}
-                className={`input input-bordered w-full pl-10`}
+                type={showPassword ? "text" : "password"}
+                name="password"
+                className="input input-bordered w-full pl-10"
                 placeholder=".........."
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                onChange={handleChange}
               />
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center pr-3"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeIcon className="size-5 text-base-content/40" />
