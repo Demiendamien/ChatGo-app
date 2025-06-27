@@ -1,8 +1,9 @@
 import axios from "axios";
 
 
+const API_URL = import.meta.env.VITE_API_URL || "https://chatgo-app-3.onrender.com";
 
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:5001/api", // Change this to your backend URL
+  baseURL: API_URL,
   withCredentials: true,
 });
