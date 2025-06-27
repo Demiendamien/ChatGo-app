@@ -123,7 +123,6 @@
 
 
 
-
 import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
@@ -172,6 +171,15 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+// Route de test ultra-simple
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "🚀 Backend is running!",
+    timestamp: new Date().toISOString(),
+    port: PORT
+  });
+});
+
 // Route de test
 app.get("/cors-test", (req, res) => {
   res.json({
@@ -180,22 +188,15 @@ app.get("/cors-test", (req, res) => {
   });
 });
 
-// Route de debug pour voir toutes les routes disponibles
-app.get("/debug-routes", (req, res) => {
-  const routes = [];
-  app._router.stack.forEach((middleware) => {
-    if (middleware.route) {
-      routes.push({
-        path: middleware.route.path,
-        methods: Object.keys(middleware.route.methods)
-      });
-    }
-  });
-  res.json({ routes });
-});
-
 server.listen(PORT, () => {
   console.log('Server is running on port', PORT);
   console.log('Allowed origins:', corsOptions.origin);
+  
+  // Debug des variables d'environnement
+  console.log('Environment check:');
+  console.log('- JWT_SECRET exists:', !!process.env.JWT_SECRET);
+  console.log('- MONGODB_URI exists:', !!process.env.MONGODB_URI);
+  console.log('- NODE_ENV:', process.env.NODE_ENV);
+  
   connectDB();
 });
