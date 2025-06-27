@@ -141,20 +141,26 @@ const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 
 // Configuration CORS avec les nouvelles URLs
+
+const allowedOrigins = [
+  "https://chat-go-app-41li.vercel.app", // ton frontend Vercel
+  "http://localhost:5173"                // dev local (facultatif)
+];
+
 const corsOptions = {
-  origin: [
-    "https://chat-go-app-41li.vercel.app",  // Frontend Vercel
-    "https://ton-backend.onrender.com",     // Backend Render
-    // Garde les anciennes au cas où
-    "https://chatgo-app-front.onrender.com"
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+  origin: function (origin, callback) {
+    // autorise les requêtes sans origin (par ex: curl/postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
 };
 
-// CORS middleware - simple et propre
 app.use(cors(corsOptions));
+
 
 // Middleware de parsing
 app.use(express.json({ limit: "10mb" }));
@@ -166,6 +172,12 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
   next();
 });
+
+app.use((req, res, next) => {
+  console.log("🛰️ Requête venant de :", req.headers.origin);
+  next();
+});
+// Middleware pour servir les fichiers statiques (si besoin)
 
 // Routes API
 app.use("/api/auth", authRoutes);
