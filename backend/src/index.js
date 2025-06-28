@@ -182,8 +182,8 @@ app.use((req, res, next) => {
 // Middleware pour servir les fichiers statiques (si besoin)
 
 // Routes API
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
+app.use("/auth", authRoutes);
+app.use("/messages", messageRoutes);
 
 // Route de test ultra-simple
 app.get("/", (req, res) => {
