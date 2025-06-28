@@ -15,7 +15,7 @@ import axios from "axios";
 // Déterminer l'URL de base selon l'environnement
 const API_BASE_URL =
   import.meta.env.MODE === "development"
-    ? "http://localhost:5001/api"
+    ? "http://localhost:5001"
     : import.meta.env.VITE_API_URL; // ne pas fallback sur "/api" ! ❌
 
 if (!API_BASE_URL) {
