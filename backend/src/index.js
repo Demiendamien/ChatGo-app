@@ -144,6 +144,7 @@ const __dirname = path.resolve();
 
 const allowedOrigins = [
   "https://chat-go-app-41li.vercel.app", // ton frontend Vercel
+  "https://chat-go-app-41li-abimkryek-kanga-kouadio-demiens-projects.vercel.app/", // ton frontend Vercel (autre domaine)
   "http://localhost:5173"                // dev local (facultatif)
 ];
 
