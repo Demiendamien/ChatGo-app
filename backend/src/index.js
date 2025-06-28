@@ -143,25 +143,25 @@ const __dirname = path.resolve();
 // Configuration CORS avec les nouvelles URLs
 
 const allowedOrigins = [
-  "https://chat-go-app-41li.vercel.app", // ton frontend Vercel
-  "https://chat-go-app-41li-abimkryek-kanga-kouadio-demiens-projects.vercel.app/", // ton frontend Vercel (autre domaine)
-  "chat-go-app-41li-git-main-kanga-kouadio-demiens-projects.vercel.app",
-  "http://localhost:5173"                // dev local (facultatif)
+  "https://chat-go-app-41li.vercel.app",
+  "https://chat-go-app-41li-abimkryek-kanga-kouadio-demiens-projects.vercel.app",
+  "https://chat-go-app-41li-git-main-kanga-kouadio-demiens-projects.vercel.app", // ✅ nouvelle URL Vercel
+  "http://localhost:5173"
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // autorise les requêtes sans origin (par ex: curl/postman)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
+
 
 
 // Middleware de parsing
