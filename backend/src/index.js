@@ -14,18 +14,32 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://chat-go-app-41li.vercel.app',
-  "https://chat-go-app-41li-git-main-kanga-kouadio-demiens-projects.vercel.app",
-  "https://chat-go-app-41li-abimkryek-kanga-kouadio-demiens-projects.vercel.app",
-];
 const corsOptions = {
-  origin: (origin, callback) =>
-    !origin || allowedOrigins.includes(origin)
-      ? callback(null, true)
-      : callback(new Error('Not allowed by CORS')),
+  origin: (origin, callback) => {
+    // En développement, autoriser toutes les origines
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // En production, vérifier la liste
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://chat-go-app-41li.vercel.app',
+      "https://chat-go-app-41li-git-main-kanga-kouadio-demiens-projects.vercel.app",
+      "https://chat-go-app-41li-abimkryek-kanga-kouadio-demiens-projects.vercel.app",
+      "https://chatgo-app-3.onrender.com"
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('❌ Origine refusée par CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
 };
 
 app.use(cors(corsOptions));
