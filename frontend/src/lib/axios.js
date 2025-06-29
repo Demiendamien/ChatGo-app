@@ -15,22 +15,10 @@ export const axiosInstance = axios.create({
 });
 
 // AJOUTER CET INTERCEPTEUR
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // Récupérer le token depuis localStorage
-    const token = localStorage.getItem('token');
-    
-    // Ou si vous utilisez Zustand, décommentez ces lignes :
-    // const authUser = JSON.parse(localStorage.getItem('auth-storage') || '{}');
-    // const token = authUser?.state?.authUser?.token;
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
