@@ -48,19 +48,21 @@
 // };
 
 
+
 import jwt from "jsonwebtoken";
 
 export const generateToken = (userId, res) => {
   const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: "3d",
+    expiresIn: "7d",
   });
 
+  // Configuration spécifique pour Render + Frontend séparé
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 3 * 24 * 60 * 60 * 1000,
+    secure: true, // 🔥 TOUJOURS true pour Render (HTTPS)
+    sameSite: "None", // 🔥 OBLIGATOIRE pour cross-origin
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  return token; // AJOUTER CETTE LIGNE
+  return token;
 };
