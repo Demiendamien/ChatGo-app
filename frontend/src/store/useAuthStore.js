@@ -92,10 +92,14 @@ export const useAuthStore = create((set, get) => ({
     const { authUser } = get();
     if (!authUser?._id || get().socket?.connected) return;
 
-    const socket = io(import.meta.env.VITE_API_URL, {
-      query: { userId: authUser._id },
-      withCredentials: true,
-    });
+    const socket = io(
+      import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL,
+      {
+        path: "/socket.io",
+        query: { userId: authUser._id },
+        withCredentials: true,
+      }
+    );
     set({ socket });
 
     socket.on("getOnlineUsers", (userIds) => set({ onlineUsers: userIds }));
