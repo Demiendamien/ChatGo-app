@@ -9,7 +9,7 @@ const SettingsPage = () => {
   const PREVIEW_MESSAGES = [
     {
       id: 1,
-      contennt: "Hey ! How's it going ?",
+      content: "Hey ! How's it going ?",
       isSent: false,
     },
     {

@@ -12,8 +12,9 @@ const Sidebar = () => {
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   useEffect(() => {
-    getUsers();
-    // Si getUsers n'est pas stable, mieux vaut mettre [] en dépendance
+    if (users.length === 0) {
+      getUsers();
+    }
   }, []);
 
   const filteredUsers = showOnlineOnly
@@ -58,7 +59,7 @@ const Sidebar = () => {
             onClick={() => setSelectedUser(user)}
             className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors ${
               selectedUser?._id === user._id
-                ? "bg-base-300 ring-1 ring-base-300"
+                ? "bg-primary/10 ring-1 ring-primary"
                 : ""
             }`}
             aria-pressed={selectedUser?._id === user._id}
