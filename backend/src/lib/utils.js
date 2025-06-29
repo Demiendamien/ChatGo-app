@@ -32,17 +32,35 @@
 
 
 
+// import jwt from "jsonwebtoken";
+
+// export const generateToken = (userId, res) => {
+//   const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+//     expiresIn: "3d", // 3 jours
+//   });
+
+//   res.cookie("jwt", token, {
+//     httpOnly: true,                         // ⚠️ important : empêche accès JS
+//     secure: process.env.NODE_ENV === "production", // true si prod
+//     sameSite: "strict",
+//     maxAge: 3 * 24 * 60 * 60 * 1000, // 3 jours
+//   });
+// };
+
+
 import jwt from "jsonwebtoken";
 
 export const generateToken = (userId, res) => {
   const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: "3d", // 3 jours
+    expiresIn: "3d",
   });
 
   res.cookie("jwt", token, {
-    httpOnly: true,                         // ⚠️ important : empêche accès JS
-    secure: process.env.NODE_ENV === "production", // true si prod
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 3 * 24 * 60 * 60 * 1000, // 3 jours
+    maxAge: 3 * 24 * 60 * 60 * 1000,
   });
+
+  return token; // AJOUTER CETTE LIGNE
 };

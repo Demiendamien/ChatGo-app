@@ -31,16 +31,18 @@ export const signup = async (req, res) => {
     });
 
     if (newUser) {
-      generateToken(newUser._id, res);
+      // MODIFIER CETTE LIGNE AUSSI
+    const token = generateToken(newUser._id, res);
 
-      await newUser.save();
+    await newUser.save();
 
-      res.status(201).json({
-        id: newUser._id,
-        email: newUser.email,
-        fullName: newUser.fullName,
-        profilePic: newUser.profilePic,
-      });
+    res.status(201).json({
+      id: newUser._id,
+      email: newUser.email,
+      fullName: newUser.fullName,
+      profilePic: newUser.profilePic,
+      token: token // AJOUTER CETTE LIGNE
+    });
     } else {
       res.status(400).json({ message: "Invalid user data" }); // renvoie une erreur 400 : mauvaise requête
     }
@@ -61,12 +63,16 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    generateToken(user._id, res);
+    // MODIFIER CETTE LIGNE - récupérer le token retourné
+    const token = generateToken(user._id, res);
+    
+    // MODIFIER CETTE PARTIE - ajouter le token dans la réponse
     res.status(200).json({
       id: user._id,
       email: user.email,
       fullName: user.fullName,
       profilePic: user.profilePic,
+      token: token // AJOUTER CETTE LIGNE
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
