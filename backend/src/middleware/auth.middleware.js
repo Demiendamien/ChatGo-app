@@ -1,73 +1,38 @@
-// import jwt from "jsonwebtoken";
-// import User from "../models/user.model.js";
-
-
-// export const protectRoute = async (req, res, next) => {
-//     try {
-//         const token = req.cookies.jwt
-
-//         if (!token) {
-//             return res.status(401).json({message : "Unauthorized - No Token Provider"});           
-//         }
-
-//         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-
-//         if (!decoded) {
-//             return res.status(401).json({ message : "Unauthorized - No Token Provider"});
-//         }
-        
-
-//         const user = await User.findById(decoded.userId).select("-password");
-
-//         if (!user) {
-//             return res.status(404).json({ message : "User not found"});
-//         }
-
-//         req.user = user 
-
-//         next()
-
-//     } catch (error) {
-//         console.log("Error in protectRoute middleware", error.message);
-//         res.status(500).json({message : "Internal server error"});
-
-        
-//     }
-// }
-
-
-
-
-import jwt from "jsonwebtoken"; // ✅ CORRIGÉ : "jsaonwebtoken" → "jsonwebtoken"
+import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
+    // 🔍 DEBUG: Vérifier les cookies reçus
+    console.log("🍪 Cookies reçus:", req.cookies);
+    
     const token = req.cookies.jwt;
 
     if (!token) {
+      console.log("❌ Aucun token trouvé dans les cookies");
       return res.status(401).json({ message: "Non autorisé : token manquant" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("✅ Token trouvé:", token.substring(0, 20) + "...");
 
-    // ✅ AJOUTÉ : Vérification si le token est valide
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("✅ Token décodé:", decoded);
+
     if (!decoded) {
       return res.status(401).json({ message: "Non autorisé : token invalide" });
     }
 
     const user = await User.findById(decoded.id).select("-password");
+    console.log("✅ Utilisateur trouvé:", user ? user.email : "Aucun");
     
-    // ✅ AJOUTÉ : Vérification si l'utilisateur existe
     if (!user) {
       return res.status(401).json({ message: "Utilisateur non trouvé" });
     }
     
     req.user = user;
-
     next();
   } catch (error) {
-    console.log("Erreur protectRoute :", error.message);
+    console.log("❌ Erreur protectRoute :", error.message);
     res.status(401).json({ message: "Non autorisé : token invalide" });
   }
 };
