@@ -45,27 +45,33 @@ export const useAuthStore = create((set, get) => ({
   },
 
   login: async (data) => {
-    set({ isLoggingIn: true });
-    try {
-      const res = await axiosInstance.post("/auth/login", data);
-      console.log("Réponse de connexion:", res.data);
-      
-      set({ authUser: res.data });
-      toast.success("Logged in successfully");
-      get().connectSocket();
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message || error.message || "An error occurred"
-      );
-    } finally {
-      set({ isLoggingIn: false });
-    }
-  },
+  set({ isLoggingIn: true });
+  try {
+    const res = await axiosInstance.post("/auth/login", data);
+    
+    console.log("Réponse de connexion:", res.data);
+    
+    set({ authUser: res.data });
+    
+    // AJOUTER CETTE LIGNE - stocker le token séparément
+    localStorage.setItem('token', res.data.token);
+    
+    toast.success("Logged in successfully");
+    get().connectSocket();
+  } catch (error) {
+    toast.error(
+      error?.response?.data?.message || error.message || "An error occurred"
+    );
+  } finally {
+    set({ isLoggingIn: false });
+  }
+},
 
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
+      localStorage.removeItem('token'); // AJOUTER CETTE LIGNE
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error) {
